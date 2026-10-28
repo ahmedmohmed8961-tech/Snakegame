@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>منظومة ايمكس // CYBER DEFENDER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cairo:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #020704;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-box {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.4), inset 0 0 10px rgba(0, 255, 65, 0.1);
+            background: rgba(3, 14, 6, 0.98);
+            padding: 16px 12px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 380px;
+            position: relative;
+        }
+
+        .header-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            direction: ltr;
+        }
+
+        .dots { color: #ff3333; letter-spacing: 3px; }
+
+        .divider {
+            width: 100%;
+            border: none;
+            border-top: 1px solid rgba(0, 255, 65, 0.35);
+            margin: 6px 0 12px 0;
+        }
+
+        /* 1. تسجيل الدخول */
+        #loginScreen {
+            width: 100%;
+            text-align: center;
+        }
+
+        .glow-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #55ff88;
+            text-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+            margin-bottom: 6px;
+        }
+
+        .sub-code {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: rgba(0, 255, 65, 0.85);
+            margin-bottom: 18px;
+            direction: ltr;
+        }
+
+        .instruction {
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            margin-bottom: 14px;
+            color: #bbfed0;
+        }
+
+        .terminal-input {
+            width: 100%;
+            background: rgba(0, 25, 8, 0.85);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 12px;
+            font-family: 'Cairo', 'Share Tech Mono', sans-serif;
+            font-size: 17px;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+            margin-bottom: 14px;
+            border-radius: 4px;
+        }
+
+        .terminal-btn {
+            width: 100%;
+            background-color: #00ff41;
+            color: #020703;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 2px;
+            box-shadow: 0 0 16px rgba(0, 255, 65, 0.5);
+            transition: 0.2s all;
+            border-radius: 4px;
+        }
+
+        .status-msg {
+            font-size: 12px;
+            margin-top: 14px;
+            letter-spacing: 1px;
+            min-height: 18px;
+            direction: ltr;
+        }
+
+        .error-shake {
+            color: #ff3344 !important;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* 2. شريط التحميل */
+        #loadingScreen {
+            display: none;
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .progress-border {
+            width: 100%;
+            height: 28px;
+            border: 2px solid #00ff41;
+            padding: 2px;
+            box-shadow: 0 0 14px rgba(0, 255, 65, 0.45);
+            background: rgba(0, 20, 5, 0.85);
+            margin: 16px 0 12px 0;
+            border-radius: 4px;
+        }
+
+        .progress-inner-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #00ff41;
+            box-shadow: 0 0 14px #00ff41;
+            transition: width 0.03s linear;
+        }
+
+        /* 3. شاشة اللعبة */
+        #gameArea {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .game-stats {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 25, 8, 0.85);
+            border: 1px solid rgba(0, 255, 65, 0.35);
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            direction: ltr;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .health-bar-container {
+            width: 80px;
+            height: 12px;
+            border: 1px solid #00ff41;
+            background: #001505;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            width: 100%;
+            height: 100%;
+            background: #00ff41;
+            transition: width 0.2s;
+        }
+
+        #gameCanvas {
+            border: 2px solid #00ff41;
+            background-color: #000c03;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            display: block;
+            touch-action: none;
+        }
+
+        .control-hint {
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            color: rgba(0, 255, 65, 0.8);
+            margin-top: 6px;
+        }
+
+        /* نافذة انتهاء اللعبة */
+        #gameOverOverlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            border-radius: 6px;
+        }
+
+        .game-over-title {
+            color: #ff3344;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 12px #ff3344;
+            margin-bottom: 6px;
+        }
+
+        .final-score {
+            font-size: 16px;
+            color: #00ff41;
+            margin-bottom: 16px;
+        }
+
+        .restart-btn {
+            background-color: #00ff41;
+            color: #000;
+            border: none;
+            padding: 10px 24px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #00ff41;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-box">
+        
+        <div class="header-bar">
+            <span><span class="dots">• • •</span> EMIX TERMINAL</span>
+            <span>SYSTEM // LOCKED</span>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 1. شاشة الدخول -->
+        <div id="loginScreen">
+            <h1 class="glow-title">منظومة ايمكس</h1>
+            <div class="sub-code">RESTRICTED SECTOR // CYBER DEFENSE</div>
+
+            <div class="instruction">[ أدخل رمز المرور لتشغيل المنظومة ]</div>
+
+            <input type="password" id="passInput" class="terminal-input" placeholder="اكتب الباسورد هنا...">
+
+            <button class="terminal-btn" onclick="checkAuth()">[ UNLOCK DEFENSE ]</button>
+
+            <div class="status-msg" id="statusBox">SYSTEM STATUS: LOCKED</div>
+        </div>
+
+        <!-- 2. شاشة التحميل -->
+        <div id="loadingScreen">
+            <div style="font-size: 20px; font-weight: bold; color: #55ff88;">INITIALIZING DEFENSE</div>
+            <div style="font-family: 'Cairo', sans-serif; font-size: 15px; color: #bbfed0; margin-top: 10px;">جارٍ تشغيل الرادار وحزم الليزر . . .</div>
+
+            <div class="progress-border">
+                <div class="progress-inner-bar" id="progressBar"></div>
+            </div>
+
+            <div style="font-size: 16px; font-weight: bold;" id="progressText">0%</div>
+        </div>
+
+        <!-- 3. شاشة اللعبة -->
+        <div id="gameArea">
+            <div class="game-stats">
+                <div>SCORE: <span id="scoreVal">0</span></div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span>HP:</span>
+                    <div class="health-bar-container">
+                        <div class="health-fill" id="hpFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="310" height="380"></canvas>
+            <div class="control-hint">اسحب إصبعك يميناً ويساراً لتحريك السفينة وإطلاق الليزر</div>
+        </div>
+
+        <!-- نافذة الخسارة -->
+        <div id="gameOverOverlay">
+            <div class="game-over-title">SYSTEM COMPROMISED</div>
+            <div class="final-score">FINAL SCORE: <span id="finalScoreVal">0</span></div>
+            <button class="restart-btn" onclick="restartGame()">إعادة الدفاع</button>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAuth() {
+            const input = document.getElementById("passInput").value.trim().toLowerCase();
+            const statusBox = document.getElementById("statusBox");
+
+            if (input === "اخوياايمكس" || input === "اخويا ايمكس" || input === "akhooyaeimx" || input === "akhoyaemix") {
+                statusBox.textContent = "ACCESS GRANTED // LAUNCHING DEFENSE...";
+                statusBox.style.color = "#00ff41";
+
+                setTimeout(() => {
+                    document.getElementById("loginScreen").style.display = "none";
+                    document.getElementById("loadingScreen").style.display = "block";
+                    startLoadingBar();
+                }, 300);
+            } else {
+                statusBox.textContent = "ACCESS DENIED // WRONG KEY";
+                statusBox.classList.add("error-shake");
+                setTimeout(() => statusBox.classList.remove("error-shake"), 500);
+            }
+        }
+
+        function startLoadingBar() {
+            const bar = document.getElementById("progressBar");
+            const text = document.getElementById("progressText");
+            let progress = 0;
+
+            const timer = setInterval(() => {
+                progress += 2;
+                bar.style.width = progress + "%";
+                text.textContent = progress + "%";
+
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        document.getElementById("loadingScreen").style.display = "none";
+                        document.getElementById("gameArea").style.display = "flex";
+                        startGame();
+                    }, 300);
+                }
+            }, 25);
+        }
+
+        document.getElementById("passInput").addEventListener("keyup", function(e) {
+            if (e.key === "Enter") checkAuth();
+        });
+
+        // ====================== محرك لعبة CYBER DEFENDER ======================
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let player = { x: canvas.width / 2, y: canvas.height - 45, width: 34, height: 26, targetX: canvas.width / 2 };
+        let bullets = [];
+        let enemies = [];
+        let particles = [];
+        let stars = [];
+        let score = 0;
+        let health = 100;
+        let isGameOver = false;
+        let lastShootTime = 0;
+        let enemySpawnTimer = 0;
+        let animationId = null;
+
+        // تهيئة النجوم في الخلفية
+        for (let i = 0; i < 40; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                speed: 0.5 + Math.random() * 1.5,
+                size: Math.random() * 2
+            });
+        }
+
+        function startGame() {
+            player.x = canvas.width / 2;
+            player.targetX = canvas.width / 2;
+            bullets = [];
+            enemies = [];
+            particles = [];
+            score = 0;
+            health = 100;
+            isGameOver = false;
+            updateUI();
+            document.getElementById("gameOverOverlay").style.display = "none";
+
+            if (animationId) cancelAnimationFrame(animationId);
+            gameLoop();
+        }
+
+        function updateUI() {
+            document.getElementById("scoreVal").textContent = score;
+            const hpFill = document.getElementById("hpFill");
+            hpFill.style.width = health + "%";
+            if (health < 40) hpFill.style.background = "#ff3344";
+            else hpFill.style.background = "#00ff41";
+        }
+
+        function spawnEnemy() {
+            const size = 20 + Math.random() * 15;
+            enemies.push({
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                width: size,
+                height: size,
+                speed: 1.5 + Math.random() * 2 + (score * 0.005),
+                hp: size > 28 ? 2 : 1
+            });
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 14; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    size: 2 + Math.random() * 2,
+                    color: color,
+                    alpha: 1
+                });
+            }
+        }
+
+        function gameLoop(timestamp) {
+            if (isGameOver) return;
+
+            // مسح الشاشة
+            ctx.fillStyle = "#000c03";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // تحريك النجوم
+            ctx.fillStyle = "rgba(0, 255, 65, 0.4)";
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) star.y = 0;
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+            });
+
+            // حركة اللاعب السلسة باتجاه التاتش
+            player.x += (player.targetX - player.x) * 0.25;
+
+            // إطلاق الليزر التلقائي
+            if (!lastShootTime || timestamp - lastShootTime > 160) {
+                bullets.push({ x: player.x, y: player.y - 6, speed: 8 });
+                lastShootTime = timestamp;
+            }
+
+            // رسم وتحديث الرصاص
+            ctx.fillStyle = "#00ff41";
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#00ff41";
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.y -= b.speed;
+                ctx.fillRect(b.x - 2, b.y, 4, 12);
+                if (b.y < -10) bullets.splice(i, 1);
+            }
+
+            // توليد وتحديث الأعداء (الفيروسات)
+            enemySpawnTimer++;
+            if (enemySpawnTimer > Math.max(30, 65 - Math.floor(score / 50))) {
+                spawnEnemy();
+                enemySpawnTimer = 0;
+            }
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+                e.y += e.speed;
+
+                // رسم الفيروس بستايل رقمي أحمر نيون
+                ctx.fillStyle = "#ff2244";
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "#ff2244";
+                ctx.fillRect(e.x, e.y, e.width, e.height);
+                ctx.strokeStyle = "#fff";
+                ctx.strokeRect(e.x + 3, e.y + 3, e.width - 6, e.height - 6);
+
+                // تصادم الرصاص مع العدو
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    const b = bullets[j];
+                    if (b.x > e.x && b.x < e.x + e.width && b.y > e.y && b.y < e.y + e.height) {
+                        e.hp--;
+                        bullets.splice(j, 1);
+                        if (e.hp <= 0) {
+                            createExplosion(e.x + e.width / 2, e.y + e.height / 2, "#ff3344");
+                            enemies.splice(i, 1);
+                            score += 15;
+                            updateUI();
+                        }
+                        break;
+                    }
+                }
+
+                // تصادم العدو مع اللاعب أو وصوله للقاع
+                if (e.y + e.height >= player.y && e.x + e.width >= player.x - 18 && e.x <= player.x + 18) {
+                    health -= 25;
+                    createExplosion(e.x, e.y, "#ff3344");
+                    enemies.splice(i, 1);
+                    updateUI();
+                    if (health <= 0) endGame();
+                } else if (e.y > canvas.height) {
+                    health -= 10;
+                    enemies.splice(i, 1);
+                    updateUI();
+                    if (health <= 0) endGame();
+                }
+            }
+
+            // تحديث الانفجارات والجزيئات
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.04;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.globalAlpha = 1.0;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            // رسم سفينة اللاعب السيبرانية
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = "#00ff41";
+            ctx.fillStyle = "#00ff41";
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y - 12);
+            ctx.lineTo(player.x + 16, player.y + 14);
+            ctx.lineTo(player.x, player.y + 8);
+            ctx.lineTo(player.x - 16, player.y + 14);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        // تحكم اللمس الفوري (Drag)
+        canvas.addEventListener("touchmove", function(e) {
+            const rect = canvas.getBoundingClientRect();
+            let touchX = e.touches[0].clientX - rect.left;
+            player.targetX = Math.max(18, Math.min(canvas.width - 18, touchX));
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener("mousemove", function(e) {
+            const rect = canvas.getBoundingClientRect();
+            let mouseX = e.clientX - rect.left;
+            player.targetX = Math.max(18, Math.min(canvas.width - 18, mouseX));
+        });
+
+        function endGame() {
+            isGameOver = true;
+            document.getElementById("finalScoreVal").textContent = score;
+            document.getElementById("gameOverOverlay").style.display = "flex";
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
